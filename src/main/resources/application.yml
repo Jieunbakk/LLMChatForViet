@@ -1,0 +1,63 @@
+spring:
+
+  jwt:
+    secret: ${JWT_SECRET_KEY}
+    expiration: 3600000
+
+  config:
+    import: optional:file:.env[.properties]
+
+  application:
+    name: llm
+
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+  #    secondary:
+  #      url: jdbc:sqlite:identifier.sqlite.db
+  #      driver-class-name: org.sqlite.JDBC
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        default_batch_fetch_size: 1000
+
+
+  web:
+    resources:
+      static-locations: classpath:/static/, file:/static/
+
+
+#  security:
+#    jwt:
+#      secret-key: ${JWT_SECRET_KEY}
+#      expiration: 3600000
+
+logging:
+  level:
+    io.github.resilience4j.ratelimiter: DEBUG
+    org:
+      hibernate:
+        SQL: debug
+
