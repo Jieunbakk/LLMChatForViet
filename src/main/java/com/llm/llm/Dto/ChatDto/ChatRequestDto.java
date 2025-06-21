@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatRequestDto {
     int userId;
-    String message;
-    Sender sender;
+    String input;
     int conversationId;
 }

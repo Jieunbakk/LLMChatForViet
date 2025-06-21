@@ -1,5 +1,6 @@
 package com.llm.llm.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.llm.llm.Dto.ChatDto.ChatRequestDto;
 import com.llm.llm.Enum.Sender;
 import jakarta.persistence.*;
@@ -32,9 +33,8 @@ public class ChatHistory {
 
     public ChatHistory(ChatRequestDto chatRequestDto) {
         this.userId = chatRequestDto.getUserId();
-        this.message = chatRequestDto.getMessage();
+        this.message = chatRequestDto.getInput();
         this.conversationId = chatRequestDto.getConversationId();
-        this.sender = chatRequestDto.getSender();
     }
 
 }
