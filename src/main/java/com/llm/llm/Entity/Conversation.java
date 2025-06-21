@@ -22,6 +22,8 @@ public class Conversation {
 
     private int userId;
 
+    private String situation;
+
     @CreationTimestamp
     private Timestamp createdAt;
 
@@ -29,6 +31,7 @@ public class Conversation {
     private Timestamp endedAt;
 
     public Conversation(ConversationRequestDto requestDto) {
+        this.situation = requestDto.getSituation();
         this.userId = requestDto.getUserId();
     }
 }

@@ -45,6 +45,8 @@ spring:
 
 
   web:
+    client:
+      llm: ${LLM_SERVER_URL}
     resources:
       static-locations: classpath:/static/, file:/static/
 
