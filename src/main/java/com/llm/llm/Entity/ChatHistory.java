@@ -32,7 +32,6 @@ public class ChatHistory {
     private int conversationId;
 
     public ChatHistory(ChatRequestDto chatRequestDto) {
-        this.userId = chatRequestDto.getUserId();
         this.message = chatRequestDto.getInput();
         this.conversationId = chatRequestDto.getConversationId();
     }

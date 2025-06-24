@@ -32,6 +32,5 @@ public class Conversation {
 
     public Conversation(ConversationRequestDto requestDto) {
         this.situation = requestDto.getSituation();
-        this.userId = requestDto.getUserId();
     }
 }

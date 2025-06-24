@@ -4,10 +4,13 @@ import com.llm.llm.Dto.ChatDto.*;
 import com.llm.llm.Entity.ChatHistory;
 import com.llm.llm.Entity.Conversation;
 import com.llm.llm.Entity.Correction;
+import com.llm.llm.Entity.User;
 import com.llm.llm.Enum.Sender;
+import com.llm.llm.Jwt.JWTUtil;
 import com.llm.llm.Repository.ChatHistoryRepository;
 import com.llm.llm.Repository.ConversationRepository;
 import com.llm.llm.Repository.CorrectionRepository;
+import com.llm.llm.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,15 +28,22 @@ public class LlmService {
     private final ChatHistoryRepository chatHistoryRepository;
     private final ConversationRepository conversationRepository;
     private final CorrectionRepository correctionRepository;
+    private final UserRepository userRepository;
     private final WebClient webClient;
+    private final JWTUtil jwtUtil;
 
     String url = "v1/ai/generate";
 
-    public LlmResponse generateResponse(ChatRequestDto chatRequestDto) {
+    public LlmResponse generateResponse(String accessToken,ChatRequestDto chatRequestDto) {
+        String userId= jwtUtil.getUserId(accessToken);
+        User user=userRepository.findByUserId(userId);
+        int userid = user.getId();
+
         System.out.println(chatRequestDto);
         List<ChatHistory> histories = chatHistoryRepository.findByConversationId(chatRequestDto.getConversationId());
         List<MessageDto> historyDtoList = convertToMessageDto(histories);
         ChatHistory newchatHistory = this.save(chatRequestDto);
+        newchatHistory.setUserId(userid);
         Conversation conversation = conversationRepository.findById(chatRequestDto.getConversationId()).get();
 
         LlmRequest llmRequest = new LlmRequest(conversation.getSituation(), historyDtoList, chatRequestDto.getInput());

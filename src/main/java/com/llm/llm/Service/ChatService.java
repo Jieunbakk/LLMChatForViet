@@ -5,9 +5,12 @@ import com.llm.llm.Dto.ChatDto.ConversationRequestDto;
 import com.llm.llm.Entity.ChatHistory;
 import com.llm.llm.Entity.Conversation;
 import com.llm.llm.Entity.Correction;
+import com.llm.llm.Entity.User;
+import com.llm.llm.Jwt.JWTUtil;
 import com.llm.llm.Repository.ChatHistoryRepository;
 import com.llm.llm.Repository.ConversationRepository;
 import com.llm.llm.Repository.CorrectionRepository;
+import com.llm.llm.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,8 @@ public class ChatService {
     private final ChatHistoryRepository chatHistoryRepository;
     private final ConversationRepository conversationRepository;
     private final CorrectionRepository correctionRepository;
+    private final UserRepository userRepository;
+    final JWTUtil jwtUtil;
 
     public List<ChatResponseDto> getChatHistory(int conversationId) {
         List<ChatHistory> chatHistoryList= chatHistoryRepository.findByConversationId(conversationId);
@@ -31,12 +36,17 @@ public class ChatService {
         return llmResponseList;
     }
 
-    public List<Conversation> getConversations(int userId) {
-        return conversationRepository.findAllByUserId(userId);
+    public List<Conversation> getConversations(String accessToken) {
+        String userId = jwtUtil.getUserId(accessToken);
+        User user = userRepository.findByUserId(userId);
+        return conversationRepository.findAllByUserId(user.getId());
     }
 
-    public int createConversation(ConversationRequestDto conversationRequestDto) {
+    public int createConversation(String accessToken, ConversationRequestDto conversationRequestDto) {
+        String userId = jwtUtil.getUserId(accessToken);
+        User user = userRepository.findByUserId(userId);
         Conversation conversation = new Conversation(conversationRequestDto);
+        conversation.setUserId(user.getId());
         return conversationRepository.save(conversation).getId();
     }
 }
