@@ -16,8 +16,7 @@ public class AuthController {
     final AuthService authService;
 
     @PostMapping("")
-    public ResponseEntity<Void> join(@RequestBody JoinDto JoinDto)
-    {
+    public ResponseEntity<Void> join(@RequestBody JoinDto JoinDto) throws CloneNotSupportedException {
         authService.join(JoinDto);
         return ResponseEntity.ok().build();
     }

@@ -37,13 +37,15 @@ public class ChatService {
     }
 
     public List<Conversation> getConversations(String accessToken) {
-        String userId = jwtUtil.getUserId(accessToken);
+        String token = accessToken.split(" ")[1];
+        String userId = jwtUtil.getUserId(token);
         User user = userRepository.findByUserId(userId);
         return conversationRepository.findAllByUserId(user.getId());
     }
 
     public int createConversation(String accessToken, ConversationRequestDto conversationRequestDto) {
-        String userId = jwtUtil.getUserId(accessToken);
+        String token = accessToken.split(" ")[1];
+        String userId = jwtUtil.getUserId(token);
         User user = userRepository.findByUserId(userId);
         Conversation conversation = new Conversation(conversationRequestDto);
         conversation.setUserId(user.getId());

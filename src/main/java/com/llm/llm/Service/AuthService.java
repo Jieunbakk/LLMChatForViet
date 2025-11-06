@@ -16,11 +16,11 @@ public class AuthService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     // 회원가입
-    public void join(JoinDto requestJoinDto){
-        boolean isExist = userRepository.existsByName((requestJoinDto.getName()));
+    public void join(JoinDto requestJoinDto) throws CloneNotSupportedException {
+        boolean isExist = userRepository.existsByUserId((requestJoinDto.getUserId()));
 
         if (isExist) {
-            return;
+            throw new CloneNotSupportedException("중복된 아이디가 존재합니다.");
         }
         User user = new User(requestJoinDto);
         System.out.println(requestJoinDto.getPassword());

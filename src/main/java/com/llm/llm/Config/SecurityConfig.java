@@ -54,7 +54,6 @@ public class SecurityConfig {
 
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil);
         loginFilter.setFilterProcessesUrl("/v1/auth/login");
-
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
@@ -68,7 +67,6 @@ public class SecurityConfig {
                         .requestMatchers("/v1/**").authenticated()
                         // .requestMatchers("/api/auth/refresh").permitAll()
                         .anyRequest().permitAll()
-
                 );
 
         http

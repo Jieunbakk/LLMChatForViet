@@ -63,3 +63,20 @@ logging:
       hibernate:
         SQL: debug
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+  metrics:
+    distribution:
+      # 히스토그램 + 퍼센타일 계산 활성화
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
+      # SLA 버킷(원하는 경계로 조절)
+      sla:
+        http.server.requests: 100ms, 200ms, 500ms, 1s, 2s
+

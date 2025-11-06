@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.resources.ConnectionProvider;
 
 @Configuration
 public class LlmWebClientConfig {
@@ -16,6 +17,7 @@ public class LlmWebClientConfig {
 
     @Bean
     public WebClient LlmwebClient(){
+        System.out.println("✅ [LlmWebClientConfig] baseUrl from yml: " + url);
         return WebClient.builder()
                 .baseUrl(url)
                 .defaultHeaders(
