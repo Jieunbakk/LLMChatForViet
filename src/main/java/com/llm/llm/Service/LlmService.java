@@ -27,14 +27,13 @@ public class LlmService {
 
     private final ChatHistoryRepository chatHistoryRepository;
     private final ConversationRepository conversationRepository;
-    private final CorrectionRepository correctionRepository;
     private final UserRepository userRepository;
+    private final ChatService chatService;
     private final WebClient LlmwebClient;
     private final JWTUtil jwtUtil;
 
     String url = "/v1/ai/generate";
 
-    @Transactional
     @Timed(value = "service.generateResponse",percentiles = {0.5,0.95,0.99},histogram = true)
     public LlmResponse generateResponse(String accessToken,ChatRequestDto chatRequestDto) {
 
@@ -49,58 +48,18 @@ public class LlmService {
         List<ChatHistory> histories = chatHistoryRepository.findByConversationId(chatRequestDto.getConversationId());
         List<MessageDto> historyDtoList = convertToMessageDto(histories);
 
+        ChatHistory newchatHistory = chatService.saveUserChat(chatRequestDto);
 
         Conversation conversation = conversationRepository.findById(chatRequestDto.getConversationId()).get();
         LlmRequest llmRequest = new LlmRequest(conversation.getSituation(), historyDtoList, chatRequestDto.getInput());
-        //System.out.println(llmRequest);
-
         //2. 서버에 요청을 보낸다
-        LlmResponse llmResponse = RequestLlm(llmRequest);
-        //LlmResponse llmResponse = TestRequestLlm(llmRequest);
+        LlmResponse llmResponse = TestRequestLlm(llmRequest);
 
-        System.out.println(llmResponse);
-
-        //데이터를 Entity로 정제시킨다.
-        Timestamp ts = Timestamp.valueOf(llmResponse.getTimestamp().replace("T", " "));
-
-        //chatHistory저장
-        chatHistoryRepository.save(convertToChatHistory(chatRequestDto,llmResponse,ts));
-
-        //마지막 채팅 시간 업데이트
-        conversation.setEndedAt(ts);
-        conversationRepository.save(conversation);
-
-        //
-        ChatHistory newchatHistory = this.save(chatRequestDto);
-        newchatHistory.setUserId(userid);
-        correctionRepository.save(convertToCorrection(chatRequestDto,llmResponse,newchatHistory,ts));
+        chatService.saveAiResponse(newchatHistory,chatRequestDto,conversation,llmResponse,userid);
 
         return llmResponse;
     }
 
-    public ChatHistory save(ChatRequestDto chatRequestDto) {
-        ChatHistory chatHistory = new ChatHistory(chatRequestDto);
-        chatHistory.setSender(Sender.user);
-        chatHistoryRepository.save(chatHistory);
-        return chatHistory;
-    }
-
-    public ChatHistory convertToChatHistory(ChatRequestDto chatRequestDto,LlmResponse llmResponse,Timestamp ts) {
-        ChatHistory aiChat= new ChatHistory();
-        aiChat.setConversationId(chatRequestDto.getConversationId());
-        aiChat.setSender(Sender.assistant);
-        aiChat.setMessage(llmResponse.getResponse());
-        aiChat.setCreatedAt(ts);
-        return aiChat;
-    }
-
-    public Correction convertToCorrection(ChatRequestDto chatRequestDto, LlmResponse llmResponse,ChatHistory newchatHistory,Timestamp ts) {
-        Correction aiCorrection = new Correction();
-        aiCorrection.setCorrection(llmResponse.getCorrection());
-        aiCorrection.setChathistoryId(newchatHistory.getId());
-        aiCorrection.setCreatedAt(ts);
-        return aiCorrection;
-    }
 
     public List<MessageDto> convertToMessageDto(List<ChatHistory> chatHistoryList) {
         return chatHistoryList.stream()
